@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "508721508058",
+    "project_id": "fir-remoteconfig-4950a",
+    "storage_bucket": "fir-remoteconfig-4950a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:508721508058:android:c67bf389dad193b2fe7fe3",
+        "android_client_info": {
+          "package_name": "com.delta.soft"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "508721508058-6lktj32eutg4e26ca8pq15v43re4bng3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDAiaEi11dZT3adfhyBYMycDTnf26JC8zM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "508721508058-6lktj32eutg4e26ca8pq15v43re4bng3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
