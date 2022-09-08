@@ -1,4 +1,4 @@
-package com.delta.soft
+package olimp.bet.olimpbet.bk.app
 
 import android.app.Application
 

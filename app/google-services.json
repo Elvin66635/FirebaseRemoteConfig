@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "508721508058",
-    "project_id": "fir-remoteconfig-4950a",
-    "storage_bucket": "fir-remoteconfig-4950a.appspot.com"
+    "project_number": "529380523890",
+    "project_id": "gikfdl",
+    "storage_bucket": "gikfdl.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:508721508058:android:c67bf389dad193b2fe7fe3",
+        "mobilesdk_app_id": "1:529380523890:android:920538b252d82dec85e7eb",
         "android_client_info": {
-          "package_name": "com.delta.soft"
+          "package_name": "olimp.bet.olimpbet.bk.app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "508721508058-6lktj32eutg4e26ca8pq15v43re4bng3.apps.googleusercontent.com",
+          "client_id": "529380523890-r8vv5gmrhqvjd85iu5llqi4va0ljl4kp.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDAiaEi11dZT3adfhyBYMycDTnf26JC8zM"
+          "current_key": "AIzaSyAoidi7mZojWwLRZAIJm1sHGHgIfYTcVnY"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "508721508058-6lktj32eutg4e26ca8pq15v43re4bng3.apps.googleusercontent.com",
+              "client_id": "529380523890-r8vv5gmrhqvjd85iu5llqi4va0ljl4kp.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

@@ -1,4 +1,4 @@
-package com.delta.soft.model
+package olimp.bet.olimpbet.model
 
 data class ItemRowModel(
     val imageId: Int,

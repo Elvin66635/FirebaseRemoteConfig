@@ -1,4 +1,4 @@
-package com.delta.soft
+package olimp.bet.olimpbet
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.delta.soft", appContext.packageName)
+        assertEquals("olimp.bet.olimpbet.bk.app", appContext.packageName)
     }
 }

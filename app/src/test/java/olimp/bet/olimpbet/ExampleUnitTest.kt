@@ -1,4 +1,4 @@
-package com.delta.soft
+package olimp.bet.olimpbet
 
 import org.junit.Test
 
