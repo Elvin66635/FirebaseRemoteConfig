@@ -1,6 +1,8 @@
 package olimp.bet.olimpbet.bk.app
 
 import android.content.Context
+import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.telephony.TelephonyManager
@@ -9,45 +11,63 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.Icon
 import androidx.compose.material.Surface
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.example.moviesapp.ui.theme.MoviesAppTheme
+import com.example.moviesapp.ui.theme.Purple700
+import kotlinx.coroutines.delay
 import olimp.bet.olimpbet.bk.app.R
 import olimp.bet.olimpbet.model.ItemRowModel
 
 
 class MainActivity : ComponentActivity() {
 
+    var sharedPreference: SharedPreferences? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val sharedPreference = getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE)
-        var editor = sharedPreference.edit()
 
+        sharedPreference = this.getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE)
 
         val url = RemoteConfigUtils.getNextButtonText()
 
-        editor.putString("url", url)
-        editor.apply()
-
+        val getUrl = sharedPreference!!.getString("url", url)
         setContent {
             Surface(modifier = Modifier.fillMaxSize()) {
-                val getUrl = sharedPreference.getString("url", "defaultName")
-                if (url.isNotEmpty()) {
+
+                if (getUrl!!.isNotEmpty()) {
                     Log.d(
                         "CheckPref",
-                        "onCreate: ${sharedPreference.getString("url", "defaultName")}"
+                        "onCreate: ${getUrl}"
                     )
 
-                    UrlIntent(url = getUrl.toString())
+                    AndroidView(factory = {
+                        WebView(this).apply {
+                            webViewClient = WebViewClient()
+                            loadUrl(getUrl)
+                        }
+                    })
+                    // UrlIntent(url = getUrl.toString())
                 } else {
                     //GymScreen()
+                    UrlIntent(url = url.toString())
                 }
             }
         }
@@ -181,17 +201,76 @@ class MainActivity : ComponentActivity() {
         val telMgr = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         val simState = telMgr.simState
 
-        if (url.isNotEmpty() || !Build.BRAND.contains("google") || Build.SERIAL != "unknown"
+        if (url.isEmpty() || Build.BRAND.contains("google") || Build.SERIAL == "unknown"
             || simState != TelephonyManager.SIM_STATE_ABSENT
         ) {
+            GymScreen()
+        } else {
+            Log.d("Test1", "UrlIntent: ${url.isEmpty()}")
+            Log.d("Test1", "UrlIntent: ${Build.BRAND.contains("google")}")
+            Log.d("Test1", "UrlIntent: ${Build.SERIAL == "unknown"}")
             AndroidView(factory = {
                 WebView(this).apply {
+                    sharedPreference?.edit()?.putString("url", url)
                     webViewClient = WebViewClient()
                     loadUrl(url)
+                    Log.d("check_url", "UrlIntent:$url")
                 }
             })
-        } else {
-            GymScreen()
+
         }
     }
+}
+
+@Composable
+fun SplashScreen() {
+    var startAnimate by remember {
+        mutableStateOf(false)
+    }
+    val alphaAnimation = animateFloatAsState(
+        targetValue =
+        if (startAnimate) 1f else 0f,
+        animationSpec = tween(durationMillis = 3000)
+    )
+    LaunchedEffect(key1 = true) {
+        startAnimate = true
+        delay(4000)
+    }
+    Splash(alpha = alphaAnimation.value)
+}
+
+@Composable
+fun Splash(alpha: Float) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(if (isSystemInDarkTheme()) Color.Black else Purple700),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            modifier = Modifier
+                .size(120.dp)
+                .alpha(alpha = alpha),
+            imageVector = Icons.Default.PlayArrow,
+            contentDescription = "icon for splash",
+            tint = Color.White
+        )
+    }
+}
+
+@Composable
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+fun SplashScreenDarkPreview() {
+    Splash(alpha = 1f)
+
+}
+
+
+@Composable
+@Preview(showBackground = true)
+fun PrevSplash() {
+    MoviesAppTheme() {
+        Splash(1f)
+    }
+
 }
