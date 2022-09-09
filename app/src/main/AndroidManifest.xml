@@ -3,10 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="olimp.bet.olimpbet.bk.app">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name="olimp.bet.olimpbet.bk.app.MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -16,9 +15,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FirebaseRemoteConfig"
         tools:targetApi="31">
-
         <activity
-            android:name="olimp.bet.olimpbet.bk.app.SplashActivity"
+            android:name=".GymActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SplashActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/SplashScreenTheme">
@@ -28,18 +29,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
-            android:name="olimp.bet.olimpbet.bk.app.MainActivity"
+            android:name=".MainActivity"
             android:exported="true"
-            android:usesCleartextTraffic="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.FirebaseRemoteConfig">
-           <!-- <intent-filter>
+            android:theme="@style/Theme.FirebaseRemoteConfig"
+            android:usesCleartextTraffic="true">
+
+            <!--
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
+            </intent-filter>
+            -->
         </activity>
     </application>
 

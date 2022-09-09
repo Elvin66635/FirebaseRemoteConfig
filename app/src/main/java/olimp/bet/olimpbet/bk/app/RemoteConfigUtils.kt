@@ -25,10 +25,7 @@ object RemoteConfigUtils {
     }
 
     private fun getFirebaseRemoteConfig(): FirebaseRemoteConfig {
-
         val remoteConfig = Firebase.remoteConfig
-
-
         val configSettings = remoteConfigSettings {
             if (BuildConfig.DEBUG) {
                 minimumFetchIntervalInSeconds = 0
@@ -42,10 +39,9 @@ object RemoteConfigUtils {
         remoteConfig.fetchAndActivate().addOnCompleteListener {
             Log.d(TAG, "addOnCompleteListener ${remoteConfig.getString(URL)}")
         }
-
         return remoteConfig
     }
 
-    fun getNextButtonText(): String = remoteConfig.getString(URL)
+    fun getConfigUrl(): String = remoteConfig.getString(URL)
 
 }

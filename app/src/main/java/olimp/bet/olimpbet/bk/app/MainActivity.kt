@@ -32,8 +32,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.moviesapp.ui.theme.MoviesAppTheme
 import com.example.moviesapp.ui.theme.Purple700
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.ktx.remoteConfig
+import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 import kotlinx.coroutines.delay
-import olimp.bet.olimpbet.bk.app.R
 import olimp.bet.olimpbet.model.ItemRowModel
 
 
@@ -46,13 +49,11 @@ class MainActivity : ComponentActivity() {
 
         sharedPreference = this.getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE)
 
-        val url = RemoteConfigUtils.getNextButtonText()
-
-        val getUrl = sharedPreference!!.getString("url", url)
+        val getUrl = sharedPreference!!.getString("url", " ")
         setContent {
             Surface(modifier = Modifier.fillMaxSize()) {
 
-                if (getUrl!!.isNotEmpty()) {
+                if (getUrl != " ") {
                     Log.d(
                         "CheckPref",
                         "onCreate: ${getUrl}"
@@ -61,13 +62,11 @@ class MainActivity : ComponentActivity() {
                     AndroidView(factory = {
                         WebView(this).apply {
                             webViewClient = WebViewClient()
-                            loadUrl(getUrl)
+                            loadUrl(getUrl.toString())
                         }
                     })
-                    // UrlIntent(url = getUrl.toString())
                 } else {
-                    //GymScreen()
-                    UrlIntent(url = url.toString())
+                    UrlIntent()
                 }
             }
         }
@@ -197,80 +196,102 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun UrlIntent(url: String) {
-        val telMgr = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        val simState = telMgr.simState
+    fun UrlIntent() {
+        val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
+        val configSettings = remoteConfigSettings {
+            minimumFetchIntervalInSeconds = 3600
+        }
+        remoteConfig.setConfigSettingsAsync(configSettings)
 
-        if (url.isEmpty() || Build.BRAND.contains("google") || Build.SERIAL == "unknown"
-            || simState != TelephonyManager.SIM_STATE_ABSENT
-        ) {
-            GymScreen()
-        } else {
-            Log.d("Test1", "UrlIntent: ${url.isEmpty()}")
-            Log.d("Test1", "UrlIntent: ${Build.BRAND.contains("google")}")
-            Log.d("Test1", "UrlIntent: ${Build.SERIAL == "unknown"}")
-            AndroidView(factory = {
-                WebView(this).apply {
-                    sharedPreference?.edit()?.putString("url", url)
-                    webViewClient = WebViewClient()
-                    loadUrl(url)
-                    Log.d("check_url", "UrlIntent:$url")
+        remoteConfig.fetchAndActivate().addOnCompleteListener (this) { task ->
+
+            if (task.isSuccessful) {
+                val url =  remoteConfig.getString("url");
+                val telMgr = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+                val simState = telMgr.simState
+
+                if (url.isEmpty()
+//            || Build.BRAND.contains("google") || Build.SERIAL == "unknown"
+//            || simState != TelephonyManager.SIM_STATE_ABSENT
+                ) {
+                    Log.d("Test2", "UrlIntent: ${url}")
+                    Log.d("Test2", "UrlIntent: ${Build.BRAND.contains("google")}")
+                    Log.d("Test2", "UrlIntent: ${Build.SERIAL == "unknown"}")
+
+                    setContent {
+                        GymScreen()
+                    }
+                } else {
+                    Log.d("Test1", "UrlIntent: ${url.isEmpty()}")
+                    Log.d("Test1", "UrlIntent: ${Build.BRAND.contains("google")}")
+                    Log.d("Test1", "UrlIntent: ${Build.SERIAL == "unknown"}")
+
+                    setContent {
+                        AndroidView(factory = {
+                        WebView(this).apply {
+                            sharedPreference?.edit()?.putString("url", url)
+                            webViewClient = WebViewClient()
+                            loadUrl(url)
+                            Log.d("check_url", "UrlIntent:$url")
+                        }
+                    })
+                    }
                 }
-            })
+                }
+            }
+        }
 
+    }
+
+    @Composable
+    fun SplashScreen() {
+        var startAnimate by remember {
+            mutableStateOf(false)
+        }
+        val alphaAnimation = animateFloatAsState(
+            targetValue =
+            if (startAnimate) 1f else 0f,
+            animationSpec = tween(durationMillis = 3000)
+        )
+        LaunchedEffect(key1 = true) {
+            startAnimate = true
+            delay(4000)
+        }
+        Splash(alpha = alphaAnimation.value)
+    }
+
+    @Composable
+    fun Splash(alpha: Float) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(if (isSystemInDarkTheme()) Color.Black else Purple700),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                modifier = Modifier
+                    .size(120.dp)
+                    .alpha(alpha = alpha),
+                imageVector = Icons.Default.PlayArrow,
+                contentDescription = "icon for splash",
+                tint = Color.White
+            )
         }
     }
-}
 
-@Composable
-fun SplashScreen() {
-    var startAnimate by remember {
-        mutableStateOf(false)
-    }
-    val alphaAnimation = animateFloatAsState(
-        targetValue =
-        if (startAnimate) 1f else 0f,
-        animationSpec = tween(durationMillis = 3000)
-    )
-    LaunchedEffect(key1 = true) {
-        startAnimate = true
-        delay(4000)
-    }
-    Splash(alpha = alphaAnimation.value)
-}
+    @Composable
+    @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+    fun SplashScreenDarkPreview() {
+        Splash(alpha = 1f)
 
-@Composable
-fun Splash(alpha: Float) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(if (isSystemInDarkTheme()) Color.Black else Purple700),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            modifier = Modifier
-                .size(120.dp)
-                .alpha(alpha = alpha),
-            imageVector = Icons.Default.PlayArrow,
-            contentDescription = "icon for splash",
-            tint = Color.White
-        )
-    }
-}
-
-@Composable
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
-fun SplashScreenDarkPreview() {
-    Splash(alpha = 1f)
-
-}
-
-
-@Composable
-@Preview(showBackground = true)
-fun PrevSplash() {
-    MoviesAppTheme() {
-        Splash(1f)
     }
 
-}
+
+    @Composable
+    @Preview(showBackground = true)
+    fun PrevSplash() {
+        MoviesAppTheme() {
+            Splash(1f)
+        }
+
+    }
