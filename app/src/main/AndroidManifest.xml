@@ -19,6 +19,13 @@
             android:name=".GymActivity"
             android:exported="false" />
         <activity
+            android:label="@string/app_name"
+            android:name=".WebActivity"
+            android:theme="@style/Theme.AppCompat"
+            android:exported="true" >
+
+        </activity>
+        <activity
             android:name=".SplashActivity"
             android:exported="true"
             android:label="@string/app_name"
