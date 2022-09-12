@@ -16,12 +16,10 @@
         android:theme="@style/Theme.FirebaseRemoteConfig"
         tools:targetApi="31">
         <activity
-            android:name=".GymActivity"
-            android:exported="false" />
-        <activity
             android:label="@string/app_name"
             android:name=".WebActivity"
             android:theme="@style/Theme.AppCompat"
+            android:usesCleartextTraffic="true"
             android:exported="true" >
 
         </activity>

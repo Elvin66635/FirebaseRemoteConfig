@@ -20,7 +20,6 @@ private const val TAG = "MainActivity"
 class WebActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityWebBinding
-    var sharedPreference: SharedPreferences? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,20 +28,10 @@ class WebActivity : AppCompatActivity() {
         setContentView(view)
         supportActionBar!!.hide()
 
-        sharedPreference = this.getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE)
-
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
         setupActionBarWithNavController(navController)
 
 }
-}
-
-
-
-
-
-
-    }
 }
