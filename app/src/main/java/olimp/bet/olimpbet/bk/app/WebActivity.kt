@@ -16,7 +16,6 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import olimp.bet.olimpbet.bk.app.databinding.ActivityWebBinding
 
 private const val TAG = "MainActivity"
-
 class WebActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityWebBinding

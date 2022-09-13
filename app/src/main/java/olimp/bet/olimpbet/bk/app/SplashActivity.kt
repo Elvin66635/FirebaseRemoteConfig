@@ -14,7 +14,6 @@ class SplashActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         lifecycleScope.launchWhenCreated {
             delay(1000)
 

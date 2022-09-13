@@ -1,7 +1,7 @@
 package olimp.bet.olimpbet.model
 
 data class ItemRowModel(
-    val imageId: Int,
+    val image: Int,
     val title: String,
     val content: String
 )

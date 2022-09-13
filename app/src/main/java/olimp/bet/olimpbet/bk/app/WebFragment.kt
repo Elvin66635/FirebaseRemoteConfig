@@ -1,5 +1,6 @@
 package olimp.bet.olimpbet.bk.app
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
@@ -10,11 +11,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.navigation.fragment.findNavController
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfig
@@ -24,72 +28,61 @@ import olimp.bet.olimpbet.bk.app.databinding.FragmentWebBinding
 class WebFragment : Fragment() {
     private var binding: FragmentWebBinding? = null
     var sharedPreference: SharedPreferences? = null
-    private lateinit var webView: WebView
+    var configBackground: FirebaseRemoteConfig? = null
+    var result: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        RemoteConfigUtils.init()
+        configBackground = FirebaseRemoteConfig.getInstance()
+        result = configBackground?.getString("url")
+        Log.d("resultConfigOnCreate", "Result: $result")
+
+        sharedPreference = activity?.getPreferences(Context.MODE_PRIVATE) ?: return
+        with (sharedPreference?.edit()) {
+            this?.putString("url", result)
+            this?.apply()
+        }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val fragmentBinding = FragmentWebBinding.inflate(inflater, container, false)
         binding = fragmentBinding
-        // Inflate the layout for this fragment
-        val getUrlFromFirebase = RemoteConfigUtils.getConfigUrl()
-        val getUrl = sharedPreference?.getString(getUrlFromFirebase, "")
-        if (getUrlFromFirebase != null) {
-            Log.d(
-                "CheckPref",
-                "onCreate: ${getUrl}"
-            )
+
+        val sharedString = sharedPreference?.getString("url", "")
+        Log.d("OnCreateView", "Result shared string: $sharedString")
+
+        val telMgr = activity?.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        val simState = telMgr.simState
+
+        if (sharedString?.isEmpty() == true || Build.BRAND.contains("google") || Build.SERIAL == "unknown"
+            || simState != TelephonyManager.SIM_STATE_ABSENT) {
+            Log.d("nullUrl", "onCreateView: $sharedString")
+            findNavController().navigate(R.id.action_webFragment_to_gymFragment)
+        }else {
             binding?.webView?.webViewClient = WebViewClient()
-            binding?.webView?.loadUrl(getUrlFromFirebase)
-            sharedPreference?.edit()?.putString("url", getUrlFromFirebase)
-        } else {
-            Log.d("Zagl", "onCreateView: $getUrl")
+            binding?.webView?.apply {
+                    loadUrl(sharedString!!)
+            }
         }
         return binding?.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
 
     }
 
+    override fun onPause() {
+        super.onPause()
+        activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
 
-        fun urlIntent() {
-            val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
-            val configSettings = remoteConfigSettings {
-                minimumFetchIntervalInSeconds = 3600
-            }
-            remoteConfig.setConfigSettingsAsync(configSettings)
-
-            val url = remoteConfig.getString("url");
-            //       val telMgr = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-            //          val simState = telMgr.simState
-
-            if (url.isEmpty()
-//            || Build.BRAND.contains("google") || Build.SERIAL == "unknown"
-//            || simState != TelephonyManager.SIM_STATE_ABSENT
-            ) {
-                Log.d("Test2", "UrlIntent: ${url}")
-                Log.d("Test2", "UrlIntent: ${Build.BRAND.contains("google")}")
-                Log.d("Test2", "UrlIntent: ${Build.SERIAL == "unknown"}")
-
-      /*          setContent {
-                    GymScreen()
-                }*/
-            } else {
-                Log.d("Test1", "UrlIntent: ${url.isEmpty()}")
-                Log.d("Test1", "UrlIntent: ${Build.BRAND.contains("google")}")
-                Log.d("Test1", "UrlIntent: ${Build.SERIAL == "unknown"}")
-
-
-                        WebView(requireContext()).apply {
-                            sharedPreference?.edit()?.putString("url", url)
-                            webViewClient = WebViewClient()
-                            loadUrl(url)
-                            Log.d("check_url", "UrlIntent:$url")
-                        }
-                }
-            }
+        // Clear the systemUiVisibility flag
+        activity?.window?.decorView?.systemUiVisibility = 0
     }
+}
